@@ -19,16 +19,31 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask: (state, action: PayloadAction<{ columnId: string; title: string }>) => {
+    addTask: (state, action: PayloadAction<{ columnId: string; title: string, description?: string }>) => {
       state.tasks.push({
         id: `task-${Date.now()}`,
         title: action.payload.title,
         columnId: action.payload.columnId,
+        description: action.payload.description
       });
     },
-    // We’ll add edit/delete/move later
+    editTask: (
+    state,
+    action: PayloadAction<{
+        id: string;
+        title: string;
+        description?: string;
+    }>
+    ) => {
+    const { id, title, description } = action.payload;
+    const existingTask = state.tasks.find((task) => task.id === id);
+    if (existingTask) {
+        existingTask.title = title;
+        existingTask.description = description;
+    }
+    },
   },
 });
 
-export const { addTask } = tasksSlice.actions;
+export const { addTask, editTask } = tasksSlice.actions;
 export default tasksSlice.reducer;
