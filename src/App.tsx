@@ -1,10 +1,11 @@
 import { useState } from 'react'
+import Board from './components/Board'
 
 function App() {
 
   return (
     <>
-      <h1>Hello, User!</h1>
+      <Board />
     </>
   )
 }
