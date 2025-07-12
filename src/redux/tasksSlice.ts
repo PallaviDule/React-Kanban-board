@@ -28,22 +28,26 @@ const tasksSlice = createSlice({
       });
     },
     editTask: (
-    state,
-    action: PayloadAction<{
-        id: string;
-        title: string;
-        description?: string;
-    }>
-    ) => {
-    const { id, title, description } = action.payload;
-    const existingTask = state.tasks.find((task) => task.id === id);
-    if (existingTask) {
-        existingTask.title = title;
-        existingTask.description = description;
-    }
+        state,
+        action: PayloadAction<{
+            id: string;
+            title: string;
+            description?: string;
+        }>
+        ) => {
+        const { id, title, description } = action.payload;
+        const existingTask = state.tasks.find((task) => task.id === id);
+        if (existingTask) {
+            existingTask.title = title;
+            existingTask.description = description;
+        }
+    },
+    deleteTask: (state, action: PayloadAction<string>) => {
+        const taskId = action.payload;
+        state.tasks = state.tasks.filter((task) => task.id !== taskId);
     },
   },
 });
 
-export const { addTask, editTask } = tasksSlice.actions;
+export const { addTask, editTask, deleteTask } = tasksSlice.actions;
 export default tasksSlice.reducer;

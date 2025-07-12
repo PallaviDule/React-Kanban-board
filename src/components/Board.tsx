@@ -7,6 +7,7 @@ import { PencilIcon } from '@heroicons/react/24/solid';
 import TaskCard from './TaskCard';
 import { addTask, editTask } from '../redux/tasksSlice';
 import TaskCardModal from './TaskCardModal';
+import { deleteTask } from '../redux/tasksSlice';
 
 const Board: React.FC = () => {
     const columns = useSelector((state: RootState) => state.columns.columns);
@@ -129,6 +130,7 @@ const Board: React.FC = () => {
                             setTaskToEdit(task);
                             setTaskModalOpen(true);
                         }}
+                        onDelete={() => dispatch(deleteTask(task.id))}
                     />
                 ))}
             </div>
