@@ -4,9 +4,13 @@ import type { AppDispatch, RootState } from '../redux/store';
 import { addColumn, deleteColumn, renameColumn } from '../redux/columnsSlice';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { PencilIcon } from '@heroicons/react/24/solid';
+import TaskCard from './TaskCard';
+import { addTask } from '../redux/tasksSlice';
 
 const Board: React.FC = () => {
     const columns = useSelector((state: RootState) => state.columns.columns);
+    const tasks = useSelector((state: RootState) => state.tasks.tasks);
+
     const dispatch = useDispatch<AppDispatch>();
 
     const [newTitle, setNewTitle] = useState('');
@@ -14,6 +18,9 @@ const Board: React.FC = () => {
 
     const [editingId, setEditingId] = useState<string | null>(null);
     const [editTitle, setEditTitle] = useState('');
+
+    const [taskInputs, setTaskInputs] = useState<Record<string, string>>({});
+    const [showTaskInput, setShowTaskInput] = useState<Record<string, boolean>>({});
 
     const handleAddColumn = () => {
         if (newTitle.trim() !== '') {
@@ -28,7 +35,20 @@ const Board: React.FC = () => {
       dispatch(renameColumn({ id, newTitle: editTitle.trim() }));
     }
     setEditingId(null);
-  };
+    };
+
+    const handleAddTask = (columnId: string) => {
+        const title = taskInputs[columnId]?.trim();
+        if (title) {
+            dispatch(addTask({ columnId, title }));
+            setTaskInputs((prev) => ({ ...prev, [columnId]: '' }));
+            setShowTaskInput((prev) => ({ ...prev, [columnId]: false }));
+        }
+    };
+    const handleCancelTaskInput = (columnId: string) => {
+        setTaskInputs((prev) => ({ ...prev, [columnId]: '' }));
+        setShowTaskInput((prev) => ({ ...prev, [columnId]: false }));
+    };
 
   return (
     <div className="flex gap-4 p-4 overflow-x-auto">
@@ -86,11 +106,55 @@ const Board: React.FC = () => {
                 </div>
             </div>
 
-            <div className="text-gray-500">No tasks yet</div>
-        </div>
+            {/* Tasks */}
+            <div className="mt-2">
+            {tasks
+                .filter((task) => task.columnId === id)
+                .map((task) => (
+                    <TaskCard key={task.id} title={task.title} />
+                ))}
+            </div>
 
-      ))}
-      {/* Add Column Section */}
+            {/* Add Task Button */}
+            {showTaskInput[id] ? (
+                <div className="mt-2">
+                    <input
+                    type="text"
+                    placeholder="Enter task title"
+                    className="w-full text-sm border rounded px-2 py-1 mb-1"
+                    value={taskInputs[id] || ''}
+                    onChange={(e) =>
+                        setTaskInputs((prev) => ({ ...prev, [id]: e.target.value }))
+                    }
+                    />
+                    <div className="flex gap-2">
+                    <button
+                        onClick={() => handleAddTask(id)}
+                        className="bg-blue-500 text-white px-2 py-1 text-xs rounded"
+                    >
+                        Add
+                    </button>
+                    <button
+                        onClick={() => handleCancelTaskInput(id)}
+                        className="text-xs px-2 py-1 rounded border"
+                    >
+                        Cancel
+                    </button>
+                    </div>
+                </div>
+                ) : (
+                <button
+                    onClick={() =>
+                    setShowTaskInput((prev) => ({ ...prev, [id]: true }))
+                    }
+                    className="mt-2 text-xs text-blue-600 hover:underline"
+                >
+                    + Add Task
+                </button>
+            )}
+        </div>
+        ))}
+        {/* Add Column Section */}
         <div className="min-w-[250px] flex-shrink-0">
           {showInput ? (
             <div className="bg-white p-4 rounded-md border border-gray-300">
