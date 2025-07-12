@@ -1,4 +1,4 @@
-import { createSlice} from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction} from '@reduxjs/toolkit';
 
 export interface Column {
   id: string;
@@ -21,7 +21,12 @@ const columnsSlice = createSlice({
   name: 'columns',
   initialState,
   reducers: {
+    addColumn: (state, action: PayloadAction<string>) => {
+      const id = `col-${state.columns.length + 1}`;
+      state.columns.push({ id, title: action.payload });
+    },
   },
 });
 
+export const { addColumn } = columnsSlice.actions;
 export default columnsSlice.reducer;
