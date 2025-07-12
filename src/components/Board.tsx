@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../redux/store';
-import { addColumn } from '../redux/columnsSlice';
+import { addColumn, deleteColumn } from '../redux/columnsSlice';
+import { TrashIcon } from '@heroicons/react/24/outline';
 
 const Board: React.FC = () => {
     const columns = useSelector((state: RootState) => state.columns.columns);
@@ -25,8 +26,15 @@ const Board: React.FC = () => {
       {columns.map(({id, title}) => (
         <div
           key={id}
-          className="bg-gray-100 rounded-md p-4 min-w-[250px] flex-shrink-0"
+          className="bg-gray-100 rounded-md p-4 min-w-[250px] flex-shrink-0 relative"
         >
+            <button
+                onClick={() => dispatch(deleteColumn(id))}
+                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 text-sm"
+                title="Delete Column"
+            >
+                <TrashIcon className="w-5 h-5 text-gray-500 hover:text-red-600" />
+            </button>
           <h2 className="font-semibold text-lg mb-2">{title}</h2>
           {/* Tasks will go here */}
           <div className="text-gray-500">No tasks yet</div>
