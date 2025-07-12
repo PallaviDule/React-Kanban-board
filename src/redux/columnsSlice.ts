@@ -28,8 +28,15 @@ const columnsSlice = createSlice({
     deleteColumn: (state, action: PayloadAction<string>) => {
       state.columns = state.columns.filter((col) => col.id !== action.payload);
     },
+    renameColumn: (state, action: PayloadAction<{ id: string; newTitle: string }>) => {
+      const column = state.columns.find((col) => col.id === action.payload.id);
+      
+      if (column) {
+        column.title = action.payload.newTitle;
+      }
+    },
   },
 });
 
-export const { addColumn, deleteColumn } = columnsSlice.actions;
+export const { addColumn, deleteColumn, renameColumn } = columnsSlice.actions;
 export default columnsSlice.reducer;
