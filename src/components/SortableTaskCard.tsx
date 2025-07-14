@@ -28,7 +28,7 @@ const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTas
             transform: CSS.Transform.toString(transform),
             transition,
               opacity: task.id === draggingTaskId ? 0 : 1,
-  pointerEvents: task.id === draggingTaskId ? 'none' : 'auto',
+              pointerEvents: task.id === draggingTaskId ? 'none' : 'auto',
         }}
         className="bg-white rounded p-2 mb-2 shadow-sm border relative group"
         >

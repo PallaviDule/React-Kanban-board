@@ -53,49 +53,48 @@ const tasksSlice = createSlice({
         const taskId = action.payload;
         state.tasks = state.tasks.filter((task) => task.id !== taskId);
     },
-    reorderTasks: (
-      state,
-      action: PayloadAction<{
-        columnId: string;
-        activeId: string;
-        overId: string;
-      }>
-    ) => {
-      const { columnId, activeId, overId } = action.payload;
+moveTaskToColumn: (state, action) => {
+  const { taskId, toColumnId, beforeTaskId } = action.payload;
+  const task = state.tasks.find(t => t.id === taskId);
+  if (!task) return;
 
-      const columnTasks = state.tasks.filter(t => t.columnId === columnId);
+  // Remove task from current position
+  state.tasks = state.tasks.filter(t => t.id !== taskId);
 
-      const oldIndex = columnTasks.findIndex(task => task.id === activeId);
-      const newIndex = columnTasks.findIndex(task => task.id === overId);
+  task.columnId = toColumnId;
 
-      if (oldIndex === -1 || newIndex === -1) return;
+  // Find insertion index in new column
+  const columnTasks = state.tasks.filter(t => t.columnId === toColumnId);
+  let insertIndex = state.tasks.length; // default append at end
 
-      const idsInColumn = columnTasks.map(t => t.id);
+  if (beforeTaskId) {
+    const beforeIndex = state.tasks.findIndex(t => t.id === beforeTaskId);
+    insertIndex = beforeIndex === -1 ? state.tasks.length : beforeIndex;
+  }
 
-      const reorderedIds = [...idsInColumn];
-      const [moved] = reorderedIds.splice(oldIndex, 1);
-      reorderedIds.splice(newIndex, 0, moved);
+  // Insert task at calculated index
+  state.tasks.splice(insertIndex, 0, task);
+},
 
-      // Apply new order to tasks in state
-      const reorderedTasks = reorderedIds.map(id =>
-        state.tasks.find(t => t.id === id)!
-      );
+reorderTasks: (state, action) => {
+  const { columnId, activeId, overId } = action.payload;
 
-      const otherTasks = state.tasks.filter(t => t.columnId !== columnId);
-      state.tasks = [...otherTasks, ...reorderedTasks];
-    },
-    moveTaskToColumn: (
-      state,
-      action: PayloadAction<{
-        taskId: string;
-        toColumnId: string;
-      }>
-    ) => {
-      const task = state.tasks.find(t => t.id === action.payload.taskId);
-      if (task) {
-        task.columnId = action.payload.toColumnId;
-      }
-    },
+  const columnTasks = state.tasks.filter(t => t.columnId === columnId);
+
+  const oldIndex = columnTasks.findIndex(t => t.id === activeId);
+  const newIndex = columnTasks.findIndex(t => t.id === overId);
+  if (oldIndex === -1 || newIndex === -1) return;
+
+  // Remove active task from array
+  const [removed] = columnTasks.splice(oldIndex, 1);
+  // Insert at new position
+  columnTasks.splice(newIndex, 0, removed);
+
+  // Rebuild state.tasks with updated order for this column
+  const otherTasks = state.tasks.filter(t => t.columnId !== columnId);
+  state.tasks = [...otherTasks, ...columnTasks];
+},
+
     addCommentToTask: (state, action: PayloadAction<{ taskId: string; comment: Comment }>) => {
       const { taskId, comment } = action.payload;
       const task = state.tasks.find(t => t.id === taskId);
