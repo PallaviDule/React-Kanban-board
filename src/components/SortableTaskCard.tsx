@@ -26,10 +26,10 @@ const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTas
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
-        opacity: task.id === draggingTaskId ? 0 : 1, // hide original dragged item but keep space
-        pointerEvents: task.id === draggingTaskId ? 'none' : 'auto', // disable pointer events when dragging
+        opacity: task.id === draggingTaskId ? 0 : 1, 
+        pointerEvents: task.id === draggingTaskId ? 'none' : 'auto',
       }}
-      className="bg-white rounded p-2 mb-2 shadow-sm border relative group"
+      className="bg-white rounded p-2 mb-2 shadow-sm border border-gray-200 relative group"
     >
       {/* Drag handle only on this wrapper */}
       <div
