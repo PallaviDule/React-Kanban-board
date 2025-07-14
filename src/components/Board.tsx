@@ -69,35 +69,46 @@ const Board: React.FC = () => {
         const { active, over } = event;
         if (!over) return;
 
-        const activeTask = tasks.find((t) => t.id === active.id);
-        const overTask = tasks.find((t) => t.id === over.id);
+        const activeTask = tasks.find(t => t.id === active.id);
+        if (!activeTask) return;
 
-        if (!activeTask || !overTask) return;
-
-        // Same column
-        if (activeTask.columnId === overTask.columnId) {
-            dispatch(reorderTasks({
-                columnId: activeTask.columnId,
-                activeId: active.id,
-                overId: over.id,
-            }));
-        } else {
-            // Different columns
-            dispatch(moveTaskToColumn({
-                taskId: active.id,
-                toColumnId: overTask.columnId,
-            }));
+        // Case 1: Dropped over a task (reorder or move)
+        const overTask = tasks.find(t => t.id === over.id);
+        if (overTask) {
+            if (activeTask.columnId === overTask.columnId) {
+                dispatch(reorderTasks({
+                    columnId: activeTask.columnId,
+                    activeId: active.id,
+                    overId: over.id,
+                }));
+            } else {
+                dispatch(moveTaskToColumn({
+                    taskId: active.id,
+                    toColumnId: overTask.columnId,
+                }));
+            }
+            return;
         }
-    };
+
+            // Case 2: Dropped over a column (empty or not)
+            const overColumn = columns.find(c => c.id === over.id);
+            if (overColumn && activeTask.columnId !== overColumn.id) {
+                dispatch(moveTaskToColumn({
+                    taskId: active.id,
+                    toColumnId: overColumn.id,
+                }));
+            }
+        };
 
 
     return (
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="flex gap-4 p-4 overflow-x-auto">
         {columns.map(({id, title}) => (
-            <div
+             <div
                 key={id}
-                className="bg-gray-100 rounded-md p-4 min-w-[250px] flex-shrink-0"
+                id={id}
+                className="bg-gray-100 rounded-md p-4 min-w-[250px] flex-shrink-0 flex flex-col"
             >
                 <div className="flex justify-between items-start mb-2">
                     {editingId === id ? (
@@ -149,39 +160,44 @@ const Board: React.FC = () => {
                 </div>
 
                 {/* Tasks */}
-                <div className="mt-2">
+                <div className="mt-2 flex flex-col">
                     <SortableContext
                         items={tasks.filter((t) => t.columnId === id).map((t) => t.id)}
                         strategy={verticalListSortingStrategy}
-                        >
+                    >
                         {tasks
-                            .filter((task) => task.columnId === id)
-                            .map((task) => (
-                                <SortableTaskCard
-                                    key={task.id}
-                                    task={task}
-                                    onClick={() => {
-                                        setModalMode('edit');
-                                        setTaskToEdit(task);
-                                        setTaskModalOpen(true);
-                                    }}
-                                    onDelete={() => dispatch(deleteTask(task.id))}
-                                />
-                            ))}
+                        .filter((task) => task.columnId === id)
+                        .map((task) => (
+                            <SortableTaskCard
+                            key={task.id}
+                            task={task}
+                            onEdit={() => {
+                                setModalMode('edit');
+                                setTaskToEdit(task);
+                                setTaskModalOpen(true);
+                            }}
+                            onDelete={() => dispatch(deleteTask(task.id))}
+                            onClick={() => {
+                                setModalMode('edit');
+                                setTaskToEdit(task);
+                                setTaskModalOpen(true);
+                            }}
+                            />
+                        ))}
                     </SortableContext>
                 </div>
 
                 <button
-                    onClick={() => {
-                    setModalMode('add');
-                    setActiveColumnId(id);
-                    setTaskToEdit(null);
-                    setTaskModalOpen(true);
-                    }}
-                    className="mt-2 text-xs text-blue-600 hover:underline"
-                >
-                    + Add Task
-            </button>
+                        onClick={() => {
+                        setModalMode('add');
+                        setActiveColumnId(id);
+                        setTaskToEdit(null);
+                        setTaskModalOpen(true);
+                        }}
+                        className="mt-2 text-xs text-blue-600 hover:underline text-left"
+                    >
+                        + Add Task
+                </button>
             </div>
             ))}
             {/* Add Column Section */}
