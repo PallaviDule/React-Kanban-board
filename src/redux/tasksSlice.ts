@@ -27,7 +27,7 @@ const tasksSlice = createSlice({
   initialState,
   reducers: {
     addTask: (state, action: PayloadAction<{ columnId: string; title: string, description?: string }>) => {
-      state.tasks.push({
+      state.tasks.unshift({
         id: `task-${Date.now()}`,
         title: action.payload.title,
         columnId: action.payload.columnId,
@@ -53,47 +53,44 @@ const tasksSlice = createSlice({
         const taskId = action.payload;
         state.tasks = state.tasks.filter((task) => task.id !== taskId);
     },
-moveTaskToColumn: (state, action) => {
-  const { taskId, toColumnId, beforeTaskId } = action.payload;
-  const task = state.tasks.find(t => t.id === taskId);
-  if (!task) return;
+  moveTaskToColumn: (state, action) => {
+    const { taskId, toColumnId, beforeTaskId } = action.payload;
+    const task = state.tasks.find(t => t.id === taskId);
+    if (!task) return;
 
-  // Remove task from current position
-  state.tasks = state.tasks.filter(t => t.id !== taskId);
+    // Remove task from current position
+    state.tasks = state.tasks.filter(t => t.id !== taskId);
 
-  task.columnId = toColumnId;
+    task.columnId = toColumnId;
+    let insertIndex = state.tasks.length; // default append at end
 
-  // Find insertion index in new column
-  const columnTasks = state.tasks.filter(t => t.columnId === toColumnId);
-  let insertIndex = state.tasks.length; // default append at end
+    if (beforeTaskId) {
+      const beforeIndex = state.tasks.findIndex(t => t.id === beforeTaskId);
+      insertIndex = beforeIndex === -1 ? state.tasks.length : beforeIndex;
+    }
 
-  if (beforeTaskId) {
-    const beforeIndex = state.tasks.findIndex(t => t.id === beforeTaskId);
-    insertIndex = beforeIndex === -1 ? state.tasks.length : beforeIndex;
-  }
+    // Insert task at calculated index
+    state.tasks.splice(insertIndex, 0, task);
+  },
 
-  // Insert task at calculated index
-  state.tasks.splice(insertIndex, 0, task);
-},
+  reorderTasks: (state, action) => {
+    const { columnId, activeId, overId } = action.payload;
 
-reorderTasks: (state, action) => {
-  const { columnId, activeId, overId } = action.payload;
+    const columnTasks = state.tasks.filter(t => t.columnId === columnId);
 
-  const columnTasks = state.tasks.filter(t => t.columnId === columnId);
+    const oldIndex = columnTasks.findIndex(t => t.id === activeId);
+    const newIndex = columnTasks.findIndex(t => t.id === overId);
+    if (oldIndex === -1 || newIndex === -1) return;
 
-  const oldIndex = columnTasks.findIndex(t => t.id === activeId);
-  const newIndex = columnTasks.findIndex(t => t.id === overId);
-  if (oldIndex === -1 || newIndex === -1) return;
+    // Remove active task from array
+    const [removed] = columnTasks.splice(oldIndex, 1);
+    // Insert at new position
+    columnTasks.splice(newIndex, 0, removed);
 
-  // Remove active task from array
-  const [removed] = columnTasks.splice(oldIndex, 1);
-  // Insert at new position
-  columnTasks.splice(newIndex, 0, removed);
-
-  // Rebuild state.tasks with updated order for this column
-  const otherTasks = state.tasks.filter(t => t.columnId !== columnId);
-  state.tasks = [...otherTasks, ...columnTasks];
-},
+    // Rebuild state.tasks with updated order for this column
+    const otherTasks = state.tasks.filter(t => t.columnId !== columnId);
+    state.tasks = [...otherTasks, ...columnTasks];
+  },
 
     addCommentToTask: (state, action: PayloadAction<{ taskId: string; comment: Comment }>) => {
       const { taskId, comment } = action.payload;
