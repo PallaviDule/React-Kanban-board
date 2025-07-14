@@ -21,7 +21,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         value={title}
         onChange={(e) => onTitleChange(e.target.value)}
         required
-        className="border rounded px-3 py-2"
+        className="border border-gray-300 rounded px-3 py-2"
         autoFocus
       />
       <textarea
@@ -29,7 +29,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
         value={description}
         onChange={(e) => onDescriptionChange(e.target.value)}
         rows={4}
-        className="border rounded px-3 py-2 resize-none"
+        className="border rounded border-gray-300 px-3 py-2 resize-none"
       />
     </div>
   );

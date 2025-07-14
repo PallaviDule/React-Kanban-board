@@ -27,7 +27,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
           placeholder="Write a comment..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          className="border rounded px-3 py-2 w-full text-sm resize-none"
+          className="border border-gray-300 rounded px-3 py-2 w-full text-sm resize-none"
           rows={2}
         />
         <div className="mt-2 flex justify-end">
@@ -40,7 +40,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
               }
             }}
             disabled={!newComment.trim()}
-            className="px-4 py-2 text-sm font-semibold bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
+            className="px-1 py-2 text-xs bg-blue-600 text-white rounded hover:bg-blue-800 transition disabled:opacity-50"
           >
             Add Comment
           </button>

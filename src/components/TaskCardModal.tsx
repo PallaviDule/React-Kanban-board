@@ -88,14 +88,14 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
         <div className="flex justify-end gap-2 mt-4">
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-blue-600 text-white"
+            className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-800"
           >
             {mode === 'add' ? 'Add Task' : 'Update Task'}
           </button>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded border"
+            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-200 "
           >
             Cancel
           </button>
