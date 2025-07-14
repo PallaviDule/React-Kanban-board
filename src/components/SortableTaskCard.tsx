@@ -6,12 +6,12 @@ import type { Task } from '../redux/tasksSlice';
 
 type Props = {
   task: Task;
-  onClick: () => void;
+  draggingTaskId: string;
   onDelete: () => void;
   onEdit: () => void;
 };
 
-const SortableTaskCard: React.FC<Props> = ({ task, onClick, onDelete, onEdit }) => {
+const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTaskId }) => {
   const {
     attributes,
     listeners,
@@ -19,11 +19,7 @@ const SortableTaskCard: React.FC<Props> = ({ task, onClick, onDelete, onEdit }) 
     transform,
     transition,
   } = useSortable({ id: task.id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
+  console.log('draggingTaskId:', draggingTaskId, ' and task.id:', task.id);
 
   return (
     <div
@@ -31,6 +27,8 @@ const SortableTaskCard: React.FC<Props> = ({ task, onClick, onDelete, onEdit }) 
         style={{
             transform: CSS.Transform.toString(transform),
             transition,
+              opacity: task.id === draggingTaskId ? 0 : 1,
+  pointerEvents: task.id === draggingTaskId ? 'none' : 'auto',
         }}
         className="bg-white rounded p-2 mb-2 shadow-sm border relative group"
         >

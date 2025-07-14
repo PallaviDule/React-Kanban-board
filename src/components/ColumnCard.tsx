@@ -13,9 +13,10 @@ type ColumnProps = {
   tasks: Task[];
   onAddTaskClick: () => void;
   onEditTaskClick: (task: Task) => void;
+  draggingTaskId: string;
 };
 
-const ColumnCard: React.FC<ColumnProps> = ({ column, tasks, onAddTaskClick, onEditTaskClick }) => {
+const ColumnCard: React.FC<ColumnProps> = ({ column, tasks, onAddTaskClick, onEditTaskClick,draggingTaskId }) => {
   const dispatch = useDispatch();
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(column.title);
@@ -69,6 +70,7 @@ const ColumnCard: React.FC<ColumnProps> = ({ column, tasks, onAddTaskClick, onEd
             task={task}
             onEdit={() => onEditTaskClick(task)}
             onDelete={() => dispatch(deleteTask(task.id))}
+            draggingTaskId={draggingTaskId}
           />
         ))}
       </SortableContext>
