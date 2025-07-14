@@ -96,7 +96,7 @@ const Board: React.FC = () => {
       onDragEnd={handleDragEnd}
       onDragCancel={() => setActiveId(null)}
     >
-      <div className="flex gap-4 p-4 overflow-x-auto">
+      <div className="flex gap-4 p-4 overflow-x-auto min-h-full">
         {columns.map(col => (
           <div key={col.id} id={col.id}>
             <SortableContext
@@ -113,7 +113,10 @@ const Board: React.FC = () => {
             </SortableContext>
           </div>
         ))}
+          <div className="flex items-start">
+
         <AddColumn />
+        </div>
       </div>
 
       <DragOverlay>
