@@ -4,7 +4,7 @@ import type { AppDispatch, RootState } from '../redux/store';
 import { addColumn, deleteColumn, renameColumn } from '../redux/columnsSlice';
 import { TrashIcon } from '@heroicons/react/24/outline';
 import { PencilIcon } from '@heroicons/react/24/solid';
-import { addTask, editTask, deleteTask, reorderTasks, moveTaskToColumn } from '../redux/tasksSlice';
+import { addTask, editTask, deleteTask, reorderTasks, moveTaskToColumn, addCommentToTask, editComment, deleteComment } from '../redux/tasksSlice';
 import TaskCardModal from './TaskCardModal';
 import {
   DndContext,
@@ -13,6 +13,7 @@ import {
 import type { DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import SortableTaskCard from './SortableTaskCard';
+import { v4 as uuid } from 'uuid'
 
 const Board: React.FC = () => {
     const columns = useSelector((state: RootState) => state.columns.columns);
@@ -50,19 +51,20 @@ const Board: React.FC = () => {
     setEditingId(null);
     };
 
-    const handleAddTask = (title: string, description: string) => {
+    const handleAddTask = (title: string, description: string, comment?: string) => {
         if (!activeColumnId) return;
         dispatch(
         addTask({
             columnId: activeColumnId,
             title,
             description,
+            comment
         })
         );
     };
 
-    const handleEditTask = (id: string, title: string, description?: string) => {
-        dispatch(editTask({ id, title, description }));
+    const handleEditTask = (id: string, title: string, description?: string, comment?: string) => {
+        dispatch(editTask({ id, title, description, comment }));
     };
 
     const handleDragEnd = (event: DragEndEvent) => {
@@ -98,8 +100,20 @@ const Board: React.FC = () => {
                     toColumnId: overColumn.id,
                 }));
             }
-        };
+    };
 
+    const currentTask = taskToEdit?.id
+        ? tasks.find((t) => t.id === taskToEdit.id)
+        : null;
+
+    const handleAddComment = (taskId: string, text: string) => {
+  const comment = {
+    id: uuid(), // unique id for the comment
+    text,
+    createdAt: new Date().toISOString(),
+  };
+  dispatch(addCommentToTask({ taskId, comment }));
+};
 
     return (
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
@@ -243,18 +257,48 @@ const Board: React.FC = () => {
                 isOpen={taskModalOpen}
                 onClose={() => setTaskModalOpen(false)}
                 mode={modalMode}
-                initialData={taskToEdit || undefined}
-                onSubmit={({ id, title, description }) => {
-                if (modalMode === 'add') {
-                    handleAddTask(title, description);
-                } else if (modalMode === 'edit' && id) {
-                    handleEditTask(id, title, description);
+                initialData={
+                    currentTask
+                    ? {
+                        id: currentTask.id,
+                        title: currentTask.title,
+                        description: currentTask.description,
+                        }
+                    : undefined
                 }
+                comments={currentTask?.comments || []}
+                onSubmit={({ id, title, description }) => {
+                    if (modalMode === 'add') {
+                    handleAddTask(title, description);
+                    } else if (modalMode === 'edit' && id) {
+                    handleEditTask(id, title, description);
+                    }
                 }}
-            />
+                onAddComment={(text) => {
+                    if (!taskToEdit?.id) return;
+                    handleAddComment(taskToEdit.id, text);
+                }}
+                onEditComment={(commentId, updatedText) => {
+                    if (!taskToEdit?.id) return;
+                    dispatch(editComment({
+                    taskId: taskToEdit.id,
+                    commentId,
+                    updatedText,
+                    }));
+                }}
+                onDeleteComment={(commentId) => {
+                    if (!taskToEdit?.id) return;
+                    dispatch(deleteComment({
+                    taskId: taskToEdit.id,
+                    commentId,
+                    }));
+                }}
+                />
+
         </div>
     </DndContext>
   );
 };
 
 export default Board;
+

@@ -1,10 +1,17 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+export type Comment = {
+  id: string;
+  text: string;
+  createdAt: string;
+};
+
 export interface Task {
   id: string;
   title: string;
   description?: string;
   columnId: string;
+  comments?: Comment[];
 }
 
 interface TasksState {
@@ -89,9 +96,42 @@ const tasksSlice = createSlice({
         task.columnId = action.payload.toColumnId;
       }
     },
+    addCommentToTask: (state, action: PayloadAction<{ taskId: string; comment: Comment }>) => {
+      const { taskId, comment } = action.payload;
+      const task = state.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.comments = task.comments || [];
+        task.comments.push(comment);
+      }
+    },
+    editComment: (
+      state,
+      action: PayloadAction<{
+        taskId: string;
+        commentId: string;
+        updatedText: string;
+      }>
+    ) => {
+      const task = state.tasks.find((t) => t.id === action.payload.taskId);
+      if (task && task.comments) {
+        const comment = task.comments.find((c) => c.id === action.payload.commentId);
+        if (comment) {
+          comment.text = action.payload.updatedText;
+        }
+      }
+    },
 
-  },
+    deleteComment: (
+      state,
+      action: PayloadAction<{ taskId: string; commentId: string }>
+    ) => {
+      const task = state.tasks.find((t) => t.id === action.payload.taskId);
+      if (task && task.comments) {
+        task.comments = task.comments.filter((c) => c.id !== action.payload.commentId);
+      }
+    },
+      },
 });
 
-export const { addTask, editTask, deleteTask, reorderTasks,moveTaskToColumn } = tasksSlice.actions;
+export const { addTask, editTask, deleteTask, reorderTasks,moveTaskToColumn, addCommentToTask, editComment, deleteComment } = tasksSlice.actions;
 export default tasksSlice.reducer;
