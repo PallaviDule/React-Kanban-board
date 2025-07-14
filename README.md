@@ -9,9 +9,6 @@ An interactive, React-based Kanban board where users can manage tasks across dyn
 - View Task Details in Modal
 - Add / Edit / Delete Task Comments
 - Drag-and-Drop tasks across columns and reorder within a column
-- Real-time Filtering by:
-  - Priority (Single-select)
-  - Type (Multi-select)
 - All data persisted in `localStorage`
 
 ## Tech Stack
