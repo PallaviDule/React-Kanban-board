@@ -8,6 +8,7 @@ import {
   useSensors,
   PointerSensor,
 } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import {
   SortableContext,
   verticalListSortingStrategy,
@@ -30,7 +31,7 @@ const Board: React.FC = () => {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  // Helper: group tasks by columnId
+  // Group tasks by their columnId for easy passing to ColumnCard
   const tasksByColumn = columns.reduce<Record<string, typeof tasks>>(
     (acc, col) => {
       acc[col.id] = tasks.filter(t => t.columnId === col.id);
@@ -39,11 +40,11 @@ const Board: React.FC = () => {
     {}
   );
 
-  const handleDragStart = (event) => {
+  const handleDragStart = (event: DragStartEvent) => {
     setActiveId(String(event.active.id));
   };
 
-  const handleDragEnd = (event) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
 
@@ -52,15 +53,13 @@ const Board: React.FC = () => {
     const activeTask = tasks.find(t => t.id === active.id);
     if (!activeTask) return;
 
-    // over can be task id or column id (empty column drop)
-    // Check if over is a task
+    // Determine if over is a task or a column (empty or drop at end)
     const overTask = tasks.find(t => t.id === over.id);
-    // Check if over is a column
-    const overColumn = columns.find(c => c.id === over.id);
+    const overColumn = columns.find(c => c.id === over?.id);
 
     if (overTask) {
       if (activeTask.columnId === overTask.columnId) {
-        // reorder in same column
+        // Reorder task within same column
         dispatch(
           reorderTasks({
             columnId: activeTask.columnId,
@@ -69,7 +68,7 @@ const Board: React.FC = () => {
           })
         );
       } else {
-        // move to different column before the overTask
+        // Move task to different column, before overTask
         dispatch(
           moveTaskToColumn({
             taskId: active.id,
@@ -79,15 +78,14 @@ const Board: React.FC = () => {
         );
       }
     } else if (overColumn) {
-      // dropped on empty column or below all tasks — append
       dispatch(
         moveTaskToColumn({
           taskId: active.id,
           toColumnId: overColumn.id,
-          beforeTaskId: null,
+          beforeTaskId: null, // append to end
         })
       );
-    }
+}
   };
 
   return (
@@ -100,20 +98,20 @@ const Board: React.FC = () => {
     >
       <div className="flex gap-4 p-4 overflow-x-auto">
         {columns.map(col => (
-          <SortableContext
-            key={col.id}
-            id={col.id}
-            items={tasksByColumn[col.id].map(t => t.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <ColumnCard
-              column={col}
-              tasks={tasksByColumn[col.id]}
-              onAddTaskClick={() => dispatch(openAdd(col.id))}
-              onEditTaskClick={(task) => dispatch(openEdit(task))}
-              draggingTaskId={activeId}
-            />
-          </SortableContext>
+          <div key={col.id} id={col.id}>
+            <SortableContext
+              items={tasksByColumn[col.id].map(t => t.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <ColumnCard
+                column={col}
+                tasks={tasksByColumn[col.id]}
+                onAddTaskClick={() => dispatch(openAdd(col.id))}
+                onEditTaskClick={task => dispatch(openEdit(task))}
+                draggingTaskId={activeId || ''}
+              />
+            </SortableContext>
+          </div>
         ))}
         <AddColumn />
       </div>
