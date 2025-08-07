@@ -16,9 +16,7 @@ import type { RootState, AppDispatch } from '../redux/store';
 import AddColumn from './AddColumn';
 import ColumnCard from './ColumnCard';
 import TaskController from './TaskController';
-
-const TaskPriority : Priority[]= ['Low', 'High', 'Medium'];
-const TaskType: Type[] = ['Bug', 'Feature', 'Critical']
+import TaskFilters from './TaskFilters';
 
 const Board: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -97,26 +95,12 @@ const Board: React.FC = () => {
 
   return (
     <>
-    <select 
-      className='m-5' 
-      value={selectedType} 
-      onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedType(e.target.value as Type)}
-    >
-      <option key={'defaultType'} value={''}> Type</option>
-      {TaskType.map((currentType) => 
-          <option key={currentType} value={currentType}>{currentType}</option>
-      )}
-    </select>
-    <select 
-      className='m-5' 
-      value={selectedPriority} 
-      onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedPriority(e.target.value as Priority)}
-    >
-      <option key={'defaultType'} value={''}> Priority </option>
-      {TaskPriority.map((currentPriority) => 
-          <option key={currentPriority} value={currentPriority}>{currentPriority}</option>
-      )}
-    </select>
+    <TaskFilters 
+      selectedPriority={selectedPriority}
+      setSelectedPriority={setSelectedPriority}
+      selectedType={selectedType}
+      setSelectedType={setSelectedType}
+    />
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
