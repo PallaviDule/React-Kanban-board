@@ -1,10 +1,10 @@
 import { closestCenter, DndContext, DragOverlay, PointerSensor, useSensor, useSensors} from "@dnd-kit/core"
-import TaskController from "./TaskController"
+import TaskController from "./task/TaskController"
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { openAdd, openEdit } from "../redux/modalSlice";
-import AddColumn from "./AddColumn";
-import ColumnCard from "./ColumnCard";
+import AddColumn from './column/AddColumn';
+import ColumnCard from "./column/ColumnCard";
 import { moveTaskToColumn, reorderTasks} from "../redux/tasksSlice";
 import type { RootState, AppDispatch } from '../redux/store';
 import type { Priority, Task, Type } from "../redux/tasksSlice";
