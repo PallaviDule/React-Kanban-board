@@ -9,32 +9,41 @@ import {
   PointerSensor,
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
 
 import { openAdd, openEdit } from '../redux/modalSlice';
-import { moveTaskToColumn, reorderTasks } from '../redux/tasksSlice';
+import { moveTaskToColumn, reorderTasks, type Priority, type Task, type Type } from '../redux/tasksSlice';
 import type { RootState, AppDispatch } from '../redux/store';
 import AddColumn from './AddColumn';
 import ColumnCard from './ColumnCard';
 import TaskController from './TaskController';
 
+const TaskPriority : Priority[]= ['Low', 'High', 'Medium'];
+const TaskType: Type[] = ['Bug', 'Feature', 'Critical']
+
 const Board: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [selectedType, setSelectedType] = useState<Type | ''>('');
+  const [selectedPriority, setSelectedPriority] = useState<Priority | ''>('');
+
 
   const dispatch = useDispatch<AppDispatch>();
   const columns = useSelector((state: RootState) => state.columns.columns);
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
+
   const activeTask = activeId ? tasks.find(t => t.id === activeId) : null;
 
   const sensors = useSensors(useSensor(PointerSensor));
 
   // Group tasks by their columnId for easy passing to ColumnCard
-  const tasksByColumn = columns.reduce<Record<string, typeof tasks>>(
+  const tasksByColumn = columns.reduce<Record<string, Task[]>>(
     (acc, col) => {
-      acc[col.id] = tasks.filter(t => t.columnId === col.id);
+      console.log('task:', tasks);
+      acc[col.id] = tasks.filter(t => {
+        const selectPriority = selectedPriority ? t.priority === selectedPriority : true;
+        const selectType = selectedType ? t.type === selectedType : true;
+
+        return t.columnId === col.id && (selectPriority || selectType )
+    });
       return acc;
     },
     {}
@@ -49,8 +58,6 @@ const Board: React.FC = () => {
     setActiveId(null);
 
     if (!over || active.id === over.id) return;
-
-    const activeTask = tasks.find(t => t.id === active.id);
     if (!activeTask) return;
 
     // Determine if over is a task or a column (empty or drop at end)
@@ -89,6 +96,27 @@ const Board: React.FC = () => {
   };
 
   return (
+    <>
+    <select 
+      className='m-5' 
+      value={selectedType} 
+      onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedType(e.target.value as Type)}
+    >
+      <option key={'defaultType'} value={''}> Type</option>
+      {TaskType.map((currentType) => 
+          <option key={currentType} value={currentType}>{currentType}</option>
+      )}
+    </select>
+    <select 
+      className='m-5' 
+      value={selectedPriority} 
+      onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedPriority(e.target.value as Priority)}
+    >
+      <option key={'defaultType'} value={''}> Priority </option>
+      {TaskPriority.map((currentPriority) => 
+          <option key={currentPriority} value={currentPriority}>{currentPriority}</option>
+      )}
+    </select>
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
@@ -99,18 +127,13 @@ const Board: React.FC = () => {
       <div className="flex gap-4 p-4 overflow-x-auto min-h-full">
         {columns.map(col => (
           <div key={col.id} id={col.id}>
-            <SortableContext
-              items={tasksByColumn[col.id].map(t => t.id)}
-              strategy={verticalListSortingStrategy}
-            >
               <ColumnCard
                 column={col}
-                tasks={tasksByColumn[col.id]}
+                tasks={tasksByColumn[col.id] || []}
                 onAddTaskClick={() => dispatch(openAdd(col.id))}
                 onEditTaskClick={task => dispatch(openEdit(task))}
                 draggingTaskId={activeId || ''}
               />
-            </SortableContext>
           </div>
         ))}
           <div className="flex items-start">
@@ -130,6 +153,7 @@ const Board: React.FC = () => {
 
       <TaskController />
     </DndContext>
+    </>
   );
 };
 

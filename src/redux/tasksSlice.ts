@@ -1,5 +1,8 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+export type Priority = 'Low' | 'Medium' | 'High';
+export type Type = 'Bug' | 'Feature' | 'Critical';
+
 export type Comment = {
   id: string;
   text: string;
@@ -12,6 +15,8 @@ export interface Task {
   description?: string;
   columnId: string;
   comments?: Comment[];
+  priority?: Priority;
+  type?: Type;
 }
 
 interface TasksState {
@@ -19,7 +24,15 @@ interface TasksState {
 }
 
 const initialState: TasksState = {
-  tasks: [],
+  tasks: [{
+    id: '1234',
+    title: 'New Task',
+    description: 'New task created',
+    columnId: 'col-1',
+    comments: [],
+    priority: 'Low',
+    type: 'Bug'
+  }],
 };
 
 const tasksSlice = createSlice({

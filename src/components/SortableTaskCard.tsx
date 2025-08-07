@@ -1,6 +1,5 @@
 import React from 'react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import { TrashIcon, PencilIcon } from '@heroicons/react/24/outline';
 import type { Task } from '../redux/tasksSlice';
 
@@ -16,16 +15,12 @@ const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTas
     attributes,
     listeners,
     setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: task.id });
+  } = useSortable({ id: task.id});  
 
   return (
     <div
       ref={setNodeRef}
       style={{
-        transform: CSS.Transform.toString(transform),
-        transition,
         opacity: task.id === draggingTaskId ? 0 : 1, 
         pointerEvents: task.id === draggingTaskId ? 'none' : 'auto',
       }}
@@ -39,6 +34,8 @@ const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTas
       >
         <h1 className="text-sm font-medium">{task.title}</h1>
         <p className="text-xs text-gray-600">{task.description}</p>
+        <h3>{task.priority}</h3>
+        <h3>{task.type}</h3>
       </div>
 
       {/* Icons should be outside the draggable zone */}
