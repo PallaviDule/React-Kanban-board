@@ -12,9 +12,9 @@ type TaskFilterProps = {
 
 const TaskFilters : React.FC<TaskFilterProps> = ({selectedType, setSelectedType, selectedPriority, setSelectedPriority}) => {
   return (
-    <>
+    <div className="m-3">
         <select 
-        className='m-5' 
+        className='m-1 border border-blue-400 rounded-lg p-1' 
         value={selectedType} 
         onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedType(e.target.value as Type)}
         >
@@ -24,7 +24,7 @@ const TaskFilters : React.FC<TaskFilterProps> = ({selectedType, setSelectedType,
             )}
         </select>
         <select 
-        className='m-5' 
+        className='m-1 border border-blue-400 rounded-lg p-1' 
         value={selectedPriority} 
         onChange={(e : React.ChangeEvent<HTMLSelectElement>) => setSelectedPriority(e.target.value as Priority)}
         >
@@ -33,7 +33,7 @@ const TaskFilters : React.FC<TaskFilterProps> = ({selectedType, setSelectedType,
                 <option key={currentPriority} value={currentPriority}>{currentPriority}</option>
             )}
         </select>
-    </>
+    </div>
   )
 }
 
