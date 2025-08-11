@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Modal from '../Modal';
-import { type Comment } from '../../redux/tasksSlice';
+import { type Comment, type Priority, type Type} from '../../redux/tasksSlice';
 import TaskForm from './TaskForm';
 import CommentsSection from './CommentsSection';
 
@@ -11,8 +11,10 @@ type TaskCardModalProps = {
     id?: string;
     title?: string;
     description?: string;
+    type?: Type | '';
+    priority?: Priority | '';
   };
-  onSubmit: (data: { id?: string; title: string; description?: string }) => void;
+  onSubmit: (data: { id?: string; title: string; description?: string, type?: Type | '', priority?: Priority | ''}) => void;
   onAddComment: (comment: string) => void;
   onEditComment: (commentId: string, updatedText: string) => void;
   onDeleteComment: (commentId: string) => void;
@@ -33,14 +35,20 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
 }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [selectedType, setSelectedType] = useState<Type | ''>('');
+  const [selectedPriority, setSelectedPriority] = useState<Priority | ''>('');
 
   useEffect(() => {
     if (initialData) {
       setTitle(initialData.title || '');
       setDescription(initialData.description || '');
+      setSelectedPriority(initialData.priority || '');
+      setSelectedType(initialData.type || '');
     } else {
       setTitle('');
       setDescription('');
+      setSelectedPriority('');
+      setSelectedType('');
     }
   }, [initialData, isOpen]);
 
@@ -52,11 +60,15 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
       id: initialData?.id,
       title: title.trim(),
       description: description.trim(),
+      type: selectedType,
+      priority: selectedPriority
     });
 
     if (mode === 'add') {
       setTitle('');
       setDescription('');
+      setSelectedPriority('');
+      setSelectedType('');
     }
 
     onClose();
@@ -74,6 +86,10 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
           description={description}
           onTitleChange={setTitle}
           onDescriptionChange={setDescription}
+          selectedType = {selectedType}
+          setSelectedType = {setSelectedType}
+          selectedPriority = {selectedPriority}
+          setSelectedPriority = {setSelectedPriority}
         />
 
         {mode === 'edit' && (

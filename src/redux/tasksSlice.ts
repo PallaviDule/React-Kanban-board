@@ -39,12 +39,22 @@ const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
   reducers: {
-    addTask: (state, action: PayloadAction<{ columnId: string; title: string, description?: string }>) => {
+    addTask: (
+      state, 
+      action: PayloadAction<{ 
+        columnId: string; 
+        title: string; 
+        description?: string; 
+        type? : Type;
+        priority?: Priority; 
+      }>) => {
       state.tasks.unshift({
         id: `task-${Date.now()}`,
         title: action.payload.title,
         columnId: action.payload.columnId,
-        description: action.payload.description
+        description: action.payload.description,
+        type: action.payload.type,
+        priority: action.payload.priority
       });
     },
     editTask: (
@@ -53,13 +63,16 @@ const tasksSlice = createSlice({
             id: string;
             title: string;
             description?: string;
-        }>
-        ) => {
-        const { id, title, description } = action.payload;
+            type? : Type;
+            priority?: Priority; 
+        }>) => {
+        const { id, title, description, type, priority } = action.payload;
         const existingTask = state.tasks.find((task) => task.id === id);
         if (existingTask) {
             existingTask.title = title;
             existingTask.description = description;
+            existingTask.type = type;
+            existingTask.priority = priority;
         }
     },
     deleteTask: (state, action: PayloadAction<string>) => {

@@ -7,6 +7,8 @@ import {
   addCommentToTask,
   editComment,
   deleteComment,
+  type Type,
+  type Priority,
 } from '../../redux/tasksSlice';
 import { close } from '../../redux/modalSlice';
 import type { RootState } from '../../redux/store';
@@ -20,15 +22,15 @@ const TaskController: React.FC = () => {
 
     const currentTask = task?.id ? tasks.find((t) => t.id === task.id) : null;
 
-    const handleAddTask = (title: string, description: string) => {
+    const handleAddTask = (title: string, description: string, type: Type, priority: Priority) => {
         if (!columnId) return;
-        dispatch(addTask({ columnId, title, description }));
-        dispatch(close()); // ✅ close modal
+        dispatch(addTask({ columnId, title, description, type, priority}));
+        dispatch(close());
     };
 
-    const handleEditTask = (id: string, title: string, description: string) => {
-        dispatch(editTask({ id, title, description }));
-        dispatch(close()); // ✅ close modal
+    const handleEditTask = (id: string, title: string, description: string, type: Type, priority: Priority) => {
+        dispatch(editTask({ id, title, description, type, priority }));
+        dispatch(close());
     };
 
     const handleAddComment = (text: string) => {
@@ -51,20 +53,24 @@ const TaskController: React.FC = () => {
         dispatch(deleteComment({ taskId: task.id, commentId }));
     };
 
+    const initialData = task ? { 
+        id: task.id, 
+        title: task.title, 
+        description: task.description,
+        type: task.type,
+        priority: task.priority
+        }: undefined
+
     return (
         <TaskCardModal
             isOpen={isOpen}
-            onClose={() => dispatch(close())} // ✅ FIXED HERE
+            onClose={() => dispatch(close())}
             mode={mode}
-            initialData={
-                task
-                ? { id: task.id, title: task.title, description: task.description }
-                : undefined
-            }
+            initialData ={initialData}
             comments={currentTask?.comments || []}
-            onSubmit={({ id, title, description }) => {
-                if (mode === 'add') handleAddTask(title, description);
-                else if (mode === 'edit' && id) handleEditTask(id, title, description);
+            onSubmit={({ id, title, description, type, priority }) => {
+                if (mode === 'add') handleAddTask(title, description, type, priority);
+                else if (mode === 'edit' && id) handleEditTask(id, title, description, type, priority);
             }}
             onAddComment={handleAddComment}
             onEditComment={handleEditComment}
