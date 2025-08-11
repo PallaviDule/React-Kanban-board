@@ -1,12 +1,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { v4 as uuid } from 'uuid';
 import {
   addTask,
   editTask,
-  addCommentToTask,
-  editComment,
-  deleteComment,
   type Type,
   type Priority,
 } from '../../redux/tasksSlice';
@@ -22,7 +18,7 @@ const TaskController: React.FC = () => {
 
     const currentTask = task?.id ? tasks.find((t) => t.id === task.id) : null;
 
-    const handleAddTask = (title: string, description: string, type: Type, priority: Priority) => {
+    const handleAddTask = (title: string, description: string | undefined, type: Type, priority: Priority) => {
         if (!columnId) return;
         dispatch(addTask({ columnId, title, description, type, priority}));
         dispatch(close());
@@ -31,26 +27,6 @@ const TaskController: React.FC = () => {
     const handleEditTask = (id: string, title: string, description: string, type: Type, priority: Priority) => {
         dispatch(editTask({ id, title, description, type, priority }));
         dispatch(close());
-    };
-
-    const handleAddComment = (text: string) => {
-        if (!task) return;
-        dispatch(
-        addCommentToTask({
-            taskId: task.id,
-            comment: { id: uuid(), text, createdAt: new Date().toISOString() },
-        })
-        );
-    };
-
-    const handleEditComment = (commentId: string, updatedText: string) => {
-        if (!task) return;
-        dispatch(editComment({ taskId: task.id, commentId, updatedText }));
-    };
-
-    const handleDeleteComment = (commentId: string) => {
-        if (!task) return;
-        dispatch(deleteComment({ taskId: task.id, commentId }));
     };
 
     const initialData = task ? { 
@@ -72,9 +48,6 @@ const TaskController: React.FC = () => {
                 if (mode === 'add') handleAddTask(title, description, type, priority);
                 else if (mode === 'edit' && id) handleEditTask(id, title, description, type, priority);
             }}
-            onAddComment={handleAddComment}
-            onEditComment={handleEditComment}
-            onDeleteComment={handleDeleteComment}
         />
     );
 };

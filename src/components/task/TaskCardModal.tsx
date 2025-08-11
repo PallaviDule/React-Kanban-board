@@ -15,9 +15,6 @@ type TaskCardModalProps = {
     priority?: Priority | '';
   };
   onSubmit: (data: { id?: string; title: string; description?: string, type?: Type | '', priority?: Priority | ''}) => void;
-  onAddComment: (comment: string) => void;
-  onEditComment: (commentId: string, updatedText: string) => void;
-  onDeleteComment: (commentId: string) => void;
   comments?: Comment[];
   mode: 'add' | 'edit';
 };
@@ -27,9 +24,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
   onClose,
   initialData,
   onSubmit,
-  onAddComment,
-  onEditComment,
-  onDeleteComment,
   comments,
   mode,
 }) => {
@@ -95,9 +89,6 @@ const TaskCardModal: React.FC<TaskCardModalProps> = ({
         {mode === 'edit' && (
           <CommentsSection
             comments={comments}
-            onAddComment={onAddComment}
-            onEditComment={onEditComment}
-            onDeleteComment={onDeleteComment}
           />
         )}
 

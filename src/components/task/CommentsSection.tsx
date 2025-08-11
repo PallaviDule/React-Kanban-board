@@ -1,21 +1,40 @@
 import React, { useState } from 'react';
 import CommentItem from '../column/CommentItem';
-import { type Comment } from '../../redux/tasksSlice';
+import { addCommentToTask, deleteComment, editComment, type Comment } from '../../redux/tasksSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../../redux/store';
+import { v4 as uuid } from 'uuid';
 
 type CommentsSectionProps = {
   comments?: Comment[];
-  onAddComment: (comment: string) => void;
-  onEditComment: (commentId: string, updatedText: string) => void;
-  onDeleteComment: (commentId: string) => void;
 };
 
 const CommentsSection: React.FC<CommentsSectionProps> = ({
   comments = [],
-  onAddComment,
-  onEditComment,
-  onDeleteComment,
 }) => {
   const [newComment, setNewComment] = useState('');
+  const dispatch = useDispatch();
+  const {task} = useSelector((state: RootState) => state.modal);
+
+  const handleAddComment = (text: string) => {
+      if (!task) return;
+      dispatch(
+      addCommentToTask({
+          taskId: task.id,
+          comment: { id: uuid(), text, createdAt: new Date().toISOString() },
+      })
+      );
+  };
+
+  const handleEditComment = (commentId: string, updatedText: string) => {
+      if (!task) return;
+      dispatch(editComment({ taskId: task.id, commentId, updatedText }));
+  };
+
+  const handleDeleteComment = (commentId: string) => {
+      if (!task) return;
+      dispatch(deleteComment({ taskId: task.id, commentId }));
+  };
 
   return (
     <div className="mt-4">
@@ -35,7 +54,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
             type="button"
             onClick={() => {
               if (newComment.trim()) {
-                onAddComment(newComment.trim());
+                handleAddComment(newComment.trim());
                 setNewComment('');
               }
             }}
@@ -58,8 +77,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
               <CommentItem
                 key={c.id}
                 comment={c}
-                onEditComment={onEditComment}
-                onDeleteComment={onDeleteComment}
+                onEditComment={handleEditComment}
+                onDeleteComment={handleDeleteComment}
               />
             ))
         )}
