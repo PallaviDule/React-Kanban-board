@@ -34,8 +34,17 @@ const SortableTaskCard: React.FC<Props> = ({ task, onDelete, onEdit, draggingTas
       >
         <h1 className="text-sm font-medium">{task.title}</h1>
         <p className="text-xs text-gray-600">{task.description}</p>
-        <h3>{task.priority}</h3>
-        <h3>{task.type}</h3>
+        <div className='flex'>
+          <h3 className='text-xs'>
+            <label className=''> Priority:</label> 
+            <label className='text-gray-500'>{task.priority}</label>
+          </h3>
+          <h3 className='text-xs px-1 '>
+            <label> Type:</label> 
+            <label className='text-gray-500'>{task.type}</label>
+          </h3>
+        </div>
+
       </div>
 
       {/* Icons should be outside the draggable zone */}
