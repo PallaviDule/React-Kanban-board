@@ -12,7 +12,7 @@ type TaskFilterProps = {
 
 const TaskFilters : React.FC<TaskFilterProps> = ({selectedType, setSelectedType, selectedPriority, setSelectedPriority}) => {
   return (
-    <div className="m-3">
+    <div className="m-1">
         <select 
         className='m-1 border border-blue-400 rounded-lg p-1' 
         value={selectedType} 

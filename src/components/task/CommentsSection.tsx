@@ -37,10 +37,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({
   };
 
   return (
-    <div className="mt-4">
+    <div>
       <h3 className="text-sm font-semibold mb-2">Comments</h3>
-
-      {/* Input first */}
       <div className="mb-4">
         <textarea
           placeholder="Write a comment..."
