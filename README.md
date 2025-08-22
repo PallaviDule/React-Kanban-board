@@ -1,6 +1,7 @@
 # React Kanban Board
 
 An interactive, React-based Kanban board where users can manage tasks across dynamic columns. Built using **React + Redux Toolkit + Tailwind CSS**, with full support for drag-and-drop, task filtering, and data persistence via `localStorage`.
+<img width="1202" height="465" alt="Screenshot 2025-08-22 at 23 03 59" src="https://github.com/user-attachments/assets/ea010c0d-6d40-4540-b25e-a235a7c68093" />
 
 ## Features
 
